@@ -1,18 +1,17 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update,InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from dotenv import load_dotenv
 import os
 
 load_dotenv() 
 BOT_TOKEN=os.getenv("BOT_TOKEN")
+reply_markup=InlineKeyboardMarkup
 
 
-# Title: /start command handler
-async def start(update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = ["Welcome to the Planner bot.This is a bot that helps you plan your tasks effectively.!"reply_markup]
 # Title: Inline keyboard with options
-async def start(update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    keyboard =[
         [InlineKeyboardButton("➕New Plan",callback_data='new_plan')],
         [InlineKeyboardButton("➕Add Task",callback_data='add_task')],
         [InlineKeyboardButton("🗂 My Tasks",callback_data='my_tasks')],
@@ -22,4 +21,17 @@ async def start(update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📊 Progress",callback_data='progress')],
         [InlineKeyboardButton("⚙️ Settings",callback_data='settings')]
     ]
-    
+
+
+reply_markup=InlineKeyboardMarkup(keyboard)
+
+await update.effective_message.reply_text("👋 Welcome to the Planner bot!\n\n"
+        "This bot helps you plan your tasks effectively.",
+        reply_markup=reply_markup
+    )
+
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    print("Bot is running...")
+    app.run_polling()
