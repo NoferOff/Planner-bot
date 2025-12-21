@@ -1,11 +1,10 @@
 from telegram import Update,InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from dotenv import load_dotenv
 import os
 
 load_dotenv() 
 BOT_TOKEN=os.getenv("BOT_TOKEN")
-reply_markup=InlineKeyboardMarkup
 
 
 # Title: Inline keyboard with options
@@ -23,15 +22,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
 
-reply_markup=InlineKeyboardMarkup(keyboard)
+    reply_markup=InlineKeyboardMarkup(keyboard)
 
-await update.effective_message.reply_text("👋 Welcome to the Planner bot!\n\n"
+    await update.effective_message.reply_text("👋 Welcome to the Planner bot!\n\n"
         "This bot helps you plan your tasks effectively.",
         reply_markup=reply_markup
     )
 
 if __name__ == '__main__':
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    print("Bot is running...")
-    app.run_polling()
+ app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+
+print("Bot is running...")
+app.run_polling()
