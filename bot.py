@@ -46,7 +46,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             "Here is a list of all your current tasks."
         )
-
+    elif query.data == 'priorities':
+        await update.message.reply_text(
+            "Set and manage task priorities to focus on what matters most."
+        )
+    elif query.data == 'deadlines':
+        await update.message.reply_text(
+            "View and manage deadlines for your tasks."
+        )
+    elif query.data =='reminders':
+        await update.message.reply_text(
+            "Manage reminders so you never forget an important task."
+        )
+    elif query.data == 'progress':
+        await update.message.reply_text(
+            "Track your productivity and see how much you’ve accomplished."
+        )
+    elif query.data == 'settings':
+        await update.message.reply_text(
+            "Customize your planner and adjust bot preferences."
+        )
 
 
 if __name__ == '__main__':
