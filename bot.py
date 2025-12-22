@@ -38,7 +38,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Let's create a new plan step by step.\n"
             "You can organize your goals and tasks clearly."
         )
-
+    elif query.data == 'add_task':
+        await update.message.reply_text(
+            "Please enter the task you want to add to your plan."
+        )
+    elif query.data == 'my_task':
+        await update.message.reply_text(
+            "Here is a list of all your current tasks."
+        )
 
 
 
