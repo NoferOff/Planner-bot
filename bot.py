@@ -1,10 +1,13 @@
 from telegram import Update,InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler,CallbackQueryHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler,CallbackQueryHandler, ContextTypes, MessageHandler
 from dotenv import load_dotenv
 import os
 
 load_dotenv() 
 BOT_TOKEN=os.getenv("BOT_TOKEN")
+
+tasks ={}
+user_state ={}
 
 
 # Title: Inline keyboard with options
@@ -30,22 +33,36 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query=update.callback_query
-    data=query.data
     await query.answer()
 
+    user_id = query.from_user.id
+    data=query.data
+
+    tasks.setdefault(user_id, [])
+
+
     if query.data == 'new_plan':
+        tasks[user_id] = "WAIT_TASK"
         await query.message.reply_text(
             "Let's create a new plan step by step.\n"
             "You can organize your goals and tasks clearly."
         )
     elif query.data == 'add_task':
+        tasks[user_id] = []
         await query.message.reply_text(
             "Please enter the task you want to add to your plan."
         )
+
     elif query.data == 'my_tasks':
-        await query.message.reply_text(
-            "Here is a list of all your current tasks."
+        if not tasks[user_id]:
+            await query.message.reply_text(
+            "No tasks yet."
         )
+        else:
+            text = "🗂 Your tasks:\n"
+            for i,t in enumerate(tasks[user_id], 1):
+                text += f"{i}. {t['text']}"
+        
     elif query.data == 'priorities':
         await query.message.reply_text(
             "Set and manage task priorities to focus on what matters most."
