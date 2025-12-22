@@ -1,5 +1,5 @@
 from telegram import Update,InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler,CallbackQueryHandler, ContextTypes
 from dotenv import load_dotenv
 import os
 
@@ -34,44 +34,44 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     if query.data == 'new_plan':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "Let's create a new plan step by step.\n"
             "You can organize your goals and tasks clearly."
         )
     elif query.data == 'add_task':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "Please enter the task you want to add to your plan."
         )
-    elif query.data == 'my_task':
-        await update.message.reply_text(
+    elif query.data == 'my_tasks':
+        await query.message.reply_text(
             "Here is a list of all your current tasks."
         )
     elif query.data == 'priorities':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "Set and manage task priorities to focus on what matters most."
         )
     elif query.data == 'deadlines':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "View and manage deadlines for your tasks."
         )
     elif query.data =='reminders':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "Manage reminders so you never forget an important task."
         )
     elif query.data == 'progress':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "Track your productivity and see how much you’ve accomplished."
         )
     elif query.data == 'settings':
-        await update.message.reply_text(
+        await query.message.reply_text(
             "Customize your planner and adjust bot preferences."
         )
 
 
 if __name__ == '__main__':
- app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-app.add_handler(CommandHandler("start", start))
-
-print("Bot is running...")
-app.run_polling()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button_handler))
+    print("Bot is running...")
+    app.run_polling()
