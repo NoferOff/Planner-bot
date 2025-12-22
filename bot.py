@@ -28,6 +28,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "This bot helps you plan your tasks effectively.",
         reply_markup=reply_markup
     )
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query=update.callback_query
+    data=query.data
+    await query.answer()
+
+    if query.data == 'new_plan':
+        await update.message.reply_text(
+            "Let's create a new plan step by step.\n"
+            "You can organize your goals and tasks clearly."
+        )
+
+
+
 
 if __name__ == '__main__':
  app = ApplicationBuilder().token(BOT_TOKEN).build()
