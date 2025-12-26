@@ -76,17 +76,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == 'deadlines':
         if not tasks[user_id]:
             await query.message.reply_text("You have no tasks yet")
+        else:
+         user_state[user_id] = "WAIT_DEADLINES"
+         await query.message.reply_text("📅 Send deadline (e.g. 2025-03-10).")
+         
     elif query.data =='reminders':
         await query.message.reply_text(
             "Manage reminders so you never forget an important task."
         )
     elif query.data == 'progress':
+        total = len(tasks[user_id])
         await query.message.reply_text(
-            "Track your productivity and see how much you’ve accomplished."
+            f"📊 Progress\nTotal tasks: {total}"
         )
     elif query.data == 'settings':
         await query.message.reply_text(
-            "Customize your planner and adjust bot preferences."
+            "⚙️ Settings\nLanguage: EN\nNotifications: ON"
         )
 
 
