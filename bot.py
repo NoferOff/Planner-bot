@@ -1,5 +1,5 @@
 from telegram import Update,InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler,CallbackQueryHandler, ContextTypes, MessageHandler
+from telegram.ext import ApplicationBuilder, CommandHandler,CallbackQueryHandler, ContextTypes, MessageHandler, filters
 from dotenv import load_dotenv
 import os
 
@@ -12,10 +12,9 @@ user_state ={}
 
 # Title: Inline keyboard with options
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     keyboard =[
-        [InlineKeyboardButton("➕New Plan",callback_data='new_plan')],
-        [InlineKeyboardButton("➕Add Task",callback_data='add_task')],
+        [InlineKeyboardButton("➕ New Plan",callback_data='new_plan')],
+        [InlineKeyboardButton("➕ Add Task",callback_data='add_task')],
         [InlineKeyboardButton("🗂 My Tasks",callback_data='my_tasks')],
         [InlineKeyboardButton("⭐ Priorities",callback_data='priorities')],
         [InlineKeyboardButton("📅 Deadlines",callback_data='deadlines')],
@@ -31,6 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "This bot helps you plan your tasks effectively.",
         reply_markup=reply_markup
     )
+
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query=update.callback_query
     await query.answer()
@@ -62,15 +62,20 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = "🗂 Your tasks:\n"
             for i,t in enumerate(tasks[user_id], 1):
                 text += f"{i}. {t['text']}"
+                await query.message.reply_text(text)
         
     elif query.data == 'priorities':
-        await query.message.reply_text(
-            "Set and manage task priorities to focus on what matters most."
-        )
+        if not tasks[user_id]:
+            await query.message.reply_text(
+                "Add the tasks!"
+            )
+        else:
+         user_state[user_id] = "WAIT_PRIORITY"
+         await query.message.reply_text("⭐ Send priority (Low / Medium / High).")
+        
     elif query.data == 'deadlines':
-        await query.message.reply_text(
-            "View and manage deadlines for your tasks."
-        )
+        if not tasks[user_id]:
+            await query.message.reply_text("You have no tasks yet")
     elif query.data =='reminders':
         await query.message.reply_text(
             "Manage reminders so you never forget an important task."
@@ -90,5 +95,6 @@ if __name__ == '__main__':
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     print("Bot is running...")
     app.run_polling()
