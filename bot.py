@@ -107,8 +107,13 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("✅ Task added.")
 
  if user_state.get(user_id) == "WAIT_PRIORITY":
-    tasks[]
-
+    tasks[user_id][-1]["priority"] = text
+    user_state.pop(user_id)
+    await update.message.reply_text(f"⭐ Priority set: {text}")
+     
+ if user_state.get(user_id) == "WAIT_DEADLINES":
+    tasks[user_id][-1]["deadlines"] = text
+    user_
 
 
 if __name__ == '__main__':
