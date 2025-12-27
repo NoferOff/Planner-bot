@@ -101,7 +101,17 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
  user_id = update.message.from_user.id
  text = update.message.text
 
- if __name__ == '__main__':
+ if user_state.get(user_id) == "WAIT_TASK":
+    tasks[user_id].append({"text": text, "priority": None, "deadline": None})
+    user_state.pop(user_id)
+    await update.message.reply_text("✅ Task added.")
+
+ if user_state.get(user_id) == "WAIT_PRIORITY":
+    tasks[]
+
+
+
+if __name__ == '__main__':
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
