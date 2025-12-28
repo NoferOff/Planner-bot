@@ -83,16 +83,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     elif data == "priorities":
-        await query.message.edit_text(
-            "⭐ Priorities feature coming soon.",
-            reply_markup=main_menu()
-        )
+        if not tasks[user_id]:
+            await query.message.edit_text(
+                "⭐ No tasks to prioritize.",
+                reply_markup=main_menu()
+            )
+        else:
+            text = "⭐ Tasks (priorities not set yet):\n"
+            for i, t in enumerate(tasks[user_id], 1):
+                text += f"{i}. {t['text']}\n"
 
     elif data == "deadlines":
-        await query.message.edit_text(
-            "📅 Deadlines feature coming soon.",
+        if not tasks[user_id]:
+           await query.message.edit_text(
+            "📅 No tasks with deadlines.",
             reply_markup=main_menu()
         )
+        else:
+            text = "⭐ Tasks (deadlines not set yet):\n"
+            for i, t in enumerate(tasks[user_id], 1):
+               text == f"{i}. {t["text"]}\n"
 
     elif data == "reminders":
         await query.message.edit_text(
