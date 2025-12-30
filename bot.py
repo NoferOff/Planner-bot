@@ -6,22 +6,26 @@ from telegram.ext import (
     MessageHandler,
     ContextTypes,
     filters
+
 )
 from dotenv import load_dotenv
-import os
+import os,asyncio
 
 # ---------- ENV ----------
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # ---------- STORAGE ----------
+last_message = {}
+reminders = {}
 tasks = {}        # user_id -> list of tasks
 user_state = {}   # user_id -> current state
 
 
 # ---------- KEYBOARD ----------
-def main_menu():
-    keyboard = [
+def get_keyboard():
+    return InlineKeyboardMarkup(
+    [
         [InlineKeyboardButton("➕ New Plan", callback_data="new_plan")],
         [InlineKeyboardButton("➕ Add Task", callback_data="add_task")],
         [InlineKeyboardButton("🗂 My Tasks", callback_data="my_tasks")],
@@ -30,8 +34,8 @@ def main_menu():
         [InlineKeyboardButton("⏰ Reminders", callback_data="reminders")],
         [InlineKeyboardButton("📊 Progress", callback_data="progress")],
         [InlineKeyboardButton("⚙️ Settings", callback_data="settings")]
-    ]
-    return InlineKeyboardMarkup(keyboard)
+    ])
+    
 
 
 # ---------- /start ----------
@@ -39,38 +43,45 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 Welcome to the Planner bot!\n\n"
         "Use the buttons below to manage your tasks.",
-        reply_markup=main_menu()
+        reply_markup=get_keyboard()
     )
 
 
 # ---------- BUTTON HANDLER ----------
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
-
     user_id = query.from_user.id
     data = query.data
 
+    if user_id in last_message:
+        try:
+         await context.bot.delete_message(chat_id=query.message.chat_id,
+                                         message_id=last_message[user_id]) 
+        except:
+          pass
+   
     tasks.setdefault(user_id, [])
+
+    await query.answer()
 
     if data == "new_plan":
         await query.message.edit_text(
             "📝 New plan started.\nAdd tasks to begin.",
-            reply_markup=main_menu()
+            reply_markup=get_keyboard()
         )
 
     elif data == "add_task":
         user_state[user_id] = "WAIT_TASK"
         await query.message.edit_text(
             "✏️ Send the task text:",
-            reply_markup=main_menu()
+            reply_markup=get_keyboard()
         )
 
     elif data == "my_tasks":
         if not tasks[user_id]:
             await query.message.edit_text(
                 "🗂 You have no tasks yet.",
-                reply_markup=main_menu()
+                reply_markup=get_keyboard()
             )
         else:
             text = "🗂 Your tasks:\n"
@@ -79,14 +90,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await query.message.edit_text(
                 text,
-                reply_markup=main_menu()
+                reply_markup=get_keyboard()
             )
 
     elif data == "priorities":
         if not tasks[user_id]:
             await query.message.edit_text(
                 "⭐ No tasks to prioritize.",
-                reply_markup=main_menu()
+                reply_markup=get_keyboard()
             )
         else:
             text = "⭐ Tasks (priorities not set yet):\n"
@@ -97,7 +108,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not tasks[user_id]:
            await query.message.edit_text(
             "📅 No tasks with deadlines.",
-            reply_markup=main_menu()
+            reply_markup=get_keyboard()
         )
         else:
             text = "⭐ Tasks (deadlines not set yet):\n"
@@ -105,21 +116,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                text == f"{i}. {t["text"]}\n"
 
     elif data == "reminders":
-        await query.message.edit_text(
-            "⏰ Reminders feature coming soon.",
-            reply_markup=main_menu()
-        )
+       user_state[user_id] = "WAIT_REMINDERS_TEXT"
+       await query.message.edit_text(
+           "What should I remind you about"
+       )
+      
 
     elif data == "progress":
         await query.message.edit_text(
             f"📊 Total tasks: {len(tasks[user_id])}",
-            reply_markup=main_menu()
+            reply_markup=get_keyboard()
         )
 
     elif data == "settings":
         await query.message.edit_text(
             "⚙️ Settings will be available later.",
-            reply_markup=main_menu()
+            reply_markup=get_keyboard()
         )
 
 
@@ -139,7 +151,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "✅ Task added!\nPress ➕ Add Task to add another.",
-            reply_markup=main_menu()
+            reply_markup=get_keyboard()
         )
 
 
