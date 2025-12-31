@@ -17,9 +17,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # ---------- STORAGE ----------
 last_message = {}
-reminders = {}
+reminders_text = {}
 tasks = {}        # user_id -> list of tasks
 user_state = {}   # user_id -> current state
+
+
 
 
 # ---------- KEYBOARD ----------
@@ -47,6 +49,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+
+
 # ---------- BUTTON HANDLER ----------
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -59,6 +63,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                          message_id=last_message[user_id]) 
         except:
           pass
+
    
     tasks.setdefault(user_id, [])
 
@@ -118,7 +123,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "reminders":
        user_state[user_id] = "WAIT_REMINDERS_TEXT"
        await query.message.edit_text(
-           "What should I remind you about"
+           "What should I remind you about",
+            reply_markup=get_keyboard()
        )
       
 
@@ -140,10 +146,30 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     text = update.message.text
 
-    if user_state.get(user_id) == "WAIT_TASK":
+    state = user_state.get(user_id)
+
+
+    if state == "WAIT_REMINDERS_TEXT":
+        if not text.isdigit():
+            await update.message.reply_text("Please enter the number")
+            return
+        
+        minutes = len(text)
+        seconds = minutes*60
+        reminds = reminders_text()
+        
+        await asyncio.sleep(seconds)
+        
+        await update.message.reply_text(
+            "⏰ Remind: {reminders}"
+            reply_markup=get_keyboard()
+        )
+
+
+    if state == "WAIT_TASK":
         tasks.setdefault(user_id, []).append({
             "text": text,
-            "priority": None,
+            "priority": "",
             "deadline": None
         })
 
