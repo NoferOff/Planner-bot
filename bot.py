@@ -93,7 +93,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 7. PROGRESS
     elif data == "progress":
         total = len(tasks[user_id])
-        completed = sum(1 for t in tasks[user_id] if t['priority'] == "Done") # Example logic
         await query.message.edit_text(f"📊 Progress:\nTotal tasks: {total}", reply_markup=get_main_keyboard())
 
     # 8. SETTINGS
