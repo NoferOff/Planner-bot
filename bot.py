@@ -16,6 +16,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # ---------- STORAGE ----------
+user_settings = {}
 tasks = {}          # user_id -> list of tasks
 user_state = {}     # user_id -> state
 temp_data = {}      # user_id -> temp values (task index, reminder text)
@@ -97,9 +98,21 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 8. SETTINGS
     elif data == "settings":
-        await query.message.edit_text("⚙️ Settings will be available later.", reply_markup=get_main_keyboard())
-
-    # --- SUB-HANDLERS ---
+        user_settings.setdefault(user_id, {
+         "language": "en",        
+         "reminders_enabled": True,
+         "default_priority": "Medium"
+        })
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("language", callback_data = "pick_lang_")],
+            [InlineKeyboardButton("reminders_enabled", callback_data = "pick_remin_")],
+            [InlineKeyboardButton("default_priority", callback_data = "set_prio_")]
+        ])
+        
+        await query.message.edit_text(
+            "🌐 Choose your settings:",
+              reply_markup=keyboard
+        )
     
     # Priority Selection
     elif data.startswith("pick_pri_"):
@@ -124,6 +137,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         temp_data[user_id] = int(data.split("_")[-1])
         user_state[user_id] = "WAIT_DEADLINE_INPUT"
         await query.message.edit_text("📅 Type the deadline (e.g., '12:00' or 'Monday'):", reply_markup=None)
+
+
+    elif data.startswith("pick_lang_"):
+        temp_data[user_id] = int(data.split("_")[-1])
+        keyboard
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
