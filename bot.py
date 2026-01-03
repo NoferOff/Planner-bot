@@ -141,7 +141,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("pick_lang_"):
         temp_data[user_id] = int(data.split("_")[-1])
-        keyboard
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("English", callback_data="set_lang_en_")],
+            [InlineKeyboardButton("Deutsch", callback_data="set_lang_de_")],
+            [InlineKeyboardButton("Український", callback_data="set_lang_ua")]
+        ])
+        await query.message.edit_text("Choose language:\n", reply_markup=keyboard)
+
+    elif data.startswith("set_lang_"):
+       user_state[user_id] = "WAIT_LANGUAGE"
+       lang = data.split("_")[-1]  # en / de / ua
+       user_settings.setdefault(user_id, {})["language"] = lang
+       await query.message.edit_text(f"✅ Language set to {lang.upper()}!", reply_markup=get_main_keyboard())
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -200,6 +211,9 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Запуск у фоні, щоб не блокувати text_handler
         asyncio.create_task(delayed_reminder(minutes, user_id, reminder_content))
 
+    elif state == "WAIT_LANGUAGE":
+        lang = user_settings.get(user_id, {}).get("language", "en")
+        await update.message.edit_text([lang]["welcome"], reply_markup=get_main_keyboard())
 # ---------- MAIN ----------
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
