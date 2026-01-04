@@ -20,6 +20,104 @@ user_settings = {}
 tasks = {}          # user_id -> list of tasks
 user_state = {}     # user_id -> state
 temp_data = {}      # user_id -> temp values (task index, reminder text)
+MESSAGES = {
+    "en": {
+        "welcome": "👋 Welcome to the Planner bot!\n\nChoose an action:",
+        "language_set": "✅ Language set to {lang}!",
+
+        "new_plan": "🧹 New plan created. All tasks cleared.",
+        "send_task": "✏️ Send the task text:",
+        "no_tasks": "🗂 You have no tasks yet.",
+        "your_tasks": "🗂 Your tasks:\n\n",
+
+        "choose_task_priority": "⭐ Choose a task to set priority:",
+        "choose_priority": "Choose priority level:",
+        "priority_set": "✅ Priority set to {prio}!",
+
+        "choose_task_deadline": "📅 Choose a task to set deadline:",
+        "send_deadline": "📅 Type the deadline (e.g., '12:00' or 'Monday'):",
+        "deadline_set": "✅ Deadline '{deadline}' saved!",
+
+        "reminder_what": "⏰ What should I remind you about?",
+        "reminder_minutes": "⏱ In how many minutes?",
+        "reminder_set": "✅ Reminder set for {minutes} minute(s). I'm ready for new tasks!",
+        "reminder_error": "❌ Please enter a number (minutes).",
+
+        "progress": "📊 Progress:\nTotal tasks: {total}",
+
+        "settings": "⚙️ Choose your settings:",
+        "choose_language": "🌐 Choose language:",
+
+        "task_added": "✅ Task '{task}' added!",
+        "no_tasks_priority": "⭐ No tasks to prioritize.",
+        "no_tasks_deadline": "📅 No tasks to set deadlines."
+    },
+
+    "de": {
+        "welcome": "👋 Willkommen beim Planer-Bot!\n\nWähle eine Aktion:",
+        "language_set": "✅ Sprache auf {lang} gesetzt!",
+
+        "new_plan": "🧹 Neuer Plan erstellt. Alle Aufgaben wurden gelöscht.",
+        "send_task": "✏️ Sende den Aufgabentext:",
+        "no_tasks": "🗂 Du hast noch keine Aufgaben.",
+        "your_tasks": "🗂 Deine Aufgaben:\n\n",
+
+        "choose_task_priority": "⭐ Wähle eine Aufgabe für die Priorität:",
+        "choose_priority": "Prioritätsstufe wählen:",
+        "priority_set": "✅ Priorität auf {prio} gesetzt!",
+
+        "choose_task_deadline": "📅 Wähle eine Aufgabe für die Deadline:",
+        "send_deadline": "📅 Gib die Deadline ein (z. B. '12:00' oder 'Montag'):",
+        "deadline_set": "✅ Deadline '{deadline}' gespeichert!",
+
+        "reminder_what": "⏰ Woran soll ich dich erinnern?",
+        "reminder_minutes": "⏱ In wie vielen Minuten?",
+        "reminder_set": "✅ Erinnerung in {minutes} Minute(n) gesetzt!",
+        "reminder_error": "❌ Bitte gib eine Zahl (Minuten) ein.",
+
+        "progress": "📊 Fortschritt:\nGesamtanzahl Aufgaben: {total}",
+
+        "settings": "⚙️ Einstellungen auswählen:",
+        "choose_language": "🌐 Sprache auswählen:",
+
+        "task_added": "✅ Aufgabe '{task}' hinzugefügt!",
+        "no_tasks_priority": "⭐ Keine Aufgaben zur Priorisierung.",
+        "no_tasks_deadline": "📅 Keine Aufgaben für Deadlines."
+    },
+
+    "ua": {
+        "welcome": "👋 Ласкаво просимо до Планер-бота!\n\nОберіть дію:",
+        "language_set": "✅ Мову встановлено: {lang}!",
+
+        "new_plan": "🧹 Новий план створено. Усі завдання видалено.",
+        "send_task": "✏️ Надішліть текст завдання:",
+        "no_tasks": "🗂 У вас поки немає завдань.",
+        "your_tasks": "🗂 Ваші завдання:\n\n",
+
+        "choose_task_priority": "⭐ Оберіть завдання для встановлення пріоритету:",
+        "choose_priority": "Оберіть рівень пріоритету:",
+        "priority_set": "✅ Пріоритет встановлено: {prio}!",
+
+        "choose_task_deadline": "📅 Оберіть завдання для встановлення дедлайну:",
+        "send_deadline": "📅 Введіть дедлайн (наприклад, '12:00' або 'Понеділок'):",
+        "deadline_set": "✅ Дедлайн '{deadline}' збережено!",
+
+        "reminder_what": "⏰ Про що нагадати?",
+        "reminder_minutes": "⏱ Через скільки хвилин?",
+        "reminder_set": "✅ Нагадування встановлено через {minutes} хв.",
+        "reminder_error": "❌ Введіть число (хвилини).",
+
+        "progress": "📊 Прогрес:\nЗагальна кількість завдань: {total}",
+
+        "settings": "⚙️ Оберіть налаштування:",
+        "choose_language": "🌐 Оберіть мову:",
+
+        "task_added": "✅ Завдання '{task}' додано!",
+        "no_tasks_priority": "⭐ Немає завдань для пріоритетів.",
+        "no_tasks_deadline": "📅 Немає завдань для дедлайнів."
+    }
+}
+
 
 # ---------- KEYBOARDS ----------
 def get_main_keyboard():
@@ -36,10 +134,13 @@ def get_main_keyboard():
 
 # ---------- /START ----------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "👋 Welcome to the Planner bot!\n\nChoose an action:",
-        reply_markup=get_main_keyboard()
-    )
+   user_id = update.message.from_user.id
+   lang = user_settings.get(user_id, {}).get("language","en")
+
+   await update.message.reply_text(
+       MESSAGES[lang]["welcome"],
+       reply_markup=get_main_keyboard()
+   )
 
 # ---------- BUTTON HANDLER ----------
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -104,9 +205,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
          "default_priority": "Medium"
         })
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("language", callback_data = "pick_lang_")],
-            [InlineKeyboardButton("reminders_enabled", callback_data = "pick_remin_")],
-            [InlineKeyboardButton("default_priority", callback_data = "set_prio_")]
+            [InlineKeyboardButton("language", callback_data = "pick_lang")],
+            [InlineKeyboardButton("reminders_enabled", callback_data = "pick_remin")],
+            [InlineKeyboardButton("default_priority", callback_data = "pick_prio")]
         ])
         
         await query.message.edit_text(
@@ -118,13 +219,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("pick_pri_"):
         temp_data[user_id] = int(data.split("_")[-1])
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🟢 Low", callback_data="set_Low")],
-            [InlineKeyboardButton("🟡 Medium", callback_data="set_Medium")],
-            [InlineKeyboardButton("🔴 High", callback_data="set_High")]
+            [InlineKeyboardButton("🟢 Low", callback_data="set_pri_Low")],
+            [InlineKeyboardButton("🟡 Medium", callback_data="set_pri_Medium")],
+            [InlineKeyboardButton("🔴 High", callback_data="set_pri_High")]
         ])
         await query.message.edit_text("Choose priority level:", reply_markup=keyboard)
 
-    elif data.startswith("set_"):
+    elif data.startswith("set_pri_"):
         prio = data.split("_")[-1]
         idx = temp_data.get(user_id)
         if idx is not None:
@@ -139,20 +240,21 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.edit_text("📅 Type the deadline (e.g., '12:00' or 'Monday'):", reply_markup=None)
 
 
-    elif data.startswith("pick_lang_"):
-        temp_data[user_id] = int(data.split("_")[-1])
+    elif data == "pick_lang":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("English", callback_data="set_lang_en_")],
-            [InlineKeyboardButton("Deutsch", callback_data="set_lang_de_")],
-            [InlineKeyboardButton("Український", callback_data="set_lang_ua")]
+            [InlineKeyboardButton("English", callback_data="set_lang_en")],
+            [InlineKeyboardButton("Deutsch", callback_data="set_lang_de")],
+            [InlineKeyboardButton("Українська", callback_data="set_lang_ua")]
         ])
         await query.message.edit_text("Choose language:\n", reply_markup=keyboard)
 
     elif data.startswith("set_lang_"):
-       user_state[user_id] = "WAIT_LANGUAGE"
        lang = data.split("_")[-1]  # en / de / ua
        user_settings.setdefault(user_id, {})["language"] = lang
-       await query.message.edit_text(f"✅ Language set to {lang.upper()}!", reply_markup=get_main_keyboard())
+       await query.message.edit_text(
+           MESSAGES[lang]["language_set"].format(lang=lang.upper()),
+        reply_markup=get_main_keyboard()
+       )
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -211,9 +313,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Запуск у фоні, щоб не блокувати text_handler
         asyncio.create_task(delayed_reminder(minutes, user_id, reminder_content))
 
-    elif state == "WAIT_LANGUAGE":
-        lang = user_settings.get(user_id, {}).get("language", "en")
-        await update.message.edit_text([lang]["welcome"], reply_markup=get_main_keyboard())
+
 # ---------- MAIN ----------
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
