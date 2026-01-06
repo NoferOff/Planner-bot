@@ -184,6 +184,24 @@ MESSAGES = {
     }
 }
 
+def t(user_id, key):
+    """Повертає повідомлення або кнопку на мові користувача"""
+    lang = user_settings.get(user_id, {}).get("language", "en")
+    return MESSAGES[lang].get(key, key)
+
+# ---------- Головне меню: клавіатура залежно від мови ----------
+def get_main_keyboard(user_id):
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(t(user_id, "new_plan_btn"), callback_data="new_plan")],
+        [InlineKeyboardButton(t(user_id, "add_task_btn"), callback_data="add_task")],
+        [InlineKeyboardButton(t(user_id, "my_tasks_btn"), callback_data="my_tasks")],
+        [InlineKeyboardButton(t(user_id, "priorities_btn"), callback_data="priorities")],
+        [InlineKeyboardButton(t(user_id, "deadlines_btn"), callback_data="deadlines")],
+        [InlineKeyboardButton(t(user_id, "reminders_btn"), callback_data="reminders")],
+        [InlineKeyboardButton(t(user_id, "progress_btn"), callback_data="progress")],
+        [InlineKeyboardButton(t(user_id, "settings_btn"), callback_data="settings")]
+    ])
+
 
 # ---------- KEYBOARDS ----------
 def get_main_keyboard():
@@ -220,17 +238,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 1. NEW PLAN
     if data == "new_plan":
         tasks[user_id] = []
-        await query.message.edit_text(MESSAGES[lang]["new_plan"], reply_markup=get_main_keyboard())
+        await query.message.edit_text("🧹 New plan created. All tasks cleared.", reply_markup=get_main_keyboard())
 
     # 2. ADD TASK
     elif data == "add_task":
         user_state[user_id] = "WAIT_TASK"
-        await query.message.edit_text(MESSAGES[lang]["add_task"], reply_markup=None)
+        await query.message.edit_text("✏️ Send the task text:\n", reply_markup=None)
 
     # 3. MY TASKS
     elif data == "my_tasks":
         if not tasks[user_id]:
-            await query.message.edit_text(MESSAGES[lang]["my_task"], reply_markup=get_main_keyboard())
+            await query.message.edit_text("🗂 Your tasks:\n\n", reply_markup=get_main_keyboard())
         else:
             text = "🗂 Your tasks:\n\n"
             for i, t in enumerate(tasks[user_id], 1):
