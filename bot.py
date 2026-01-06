@@ -154,17 +154,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 1. NEW PLAN
     if data == "new_plan":
         tasks[user_id] = []
-        await query.message.edit_text("🧹 New plan created. All tasks cleared.", reply_markup=get_main_keyboard())
+        await query.message.edit_text(MESSAGES[lang]["new_plan"], reply_markup=get_main_keyboard())
 
     # 2. ADD TASK
     elif data == "add_task":
         user_state[user_id] = "WAIT_TASK"
-        await query.message.edit_text("✏️ Send the task text:", reply_markup=None)
+        await query.message.edit_text(MESSAGES[lang]["add_task"], reply_markup=None)
 
     # 3. MY TASKS
     elif data == "my_tasks":
         if not tasks[user_id]:
-            await query.message.edit_text("🗂 You have no tasks yet.", reply_markup=get_main_keyboard())
+            await query.message.edit_text(MESSAGES[lang]["my_task"], reply_markup=get_main_keyboard())
         else:
             text = "🗂 Your tasks:\n\n"
             for i, t in enumerate(tasks[user_id], 1):
@@ -205,9 +205,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
          "default_priority": "Medium"
         })
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("language", callback_data = "pick_lang")],
-            [InlineKeyboardButton("reminders_enabled", callback_data = "pick_remin")],
-            [InlineKeyboardButton("default_priority", callback_data = "pick_prio")]
+            [InlineKeyboardButton("language", callback_data = "pick_settings_lang")],
+            [InlineKeyboardButton("reminders_enabled", callback_data = "pick_settings_remin")],
+            [InlineKeyboardButton("default_priority", callback_data = "pick_settings_prio")]
         ])
         
         await query.message.edit_text(
@@ -233,6 +233,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_state.pop(user_id, None)
         await query.message.edit_text(f"✅ Priority set to {prio}!", reply_markup=get_main_keyboard())
 
+
+
+
+
     # Deadline Selection
     elif data.startswith("pick_dead_"):
         temp_data[user_id] = int(data.split("_")[-1])
@@ -240,7 +244,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.edit_text("📅 Type the deadline (e.g., '12:00' or 'Monday'):", reply_markup=None)
 
 
-    elif data == "pick_lang":
+
+
+
+    elif data == "pick_settings_lang":
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("English", callback_data="set_lang_en")],
             [InlineKeyboardButton("Deutsch", callback_data="set_lang_de")],
