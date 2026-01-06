@@ -48,7 +48,29 @@ MESSAGES = {
         "settings": "⚙️ Choose your settings:",
         "choose_language": "🌐 Choose language:",
 
-        "task_added": "✅ Task '{task}' added!",
+        # Buttons
+        "new_plan_btn": "➕ New Plan",
+        "add_task_btn": "➕ Add Task",
+        "my_tasks_btn": "🗂 My Tasks",
+        "priorities_btn": "⭐ Priorities",
+        "deadlines_btn": "📅 Deadlines",
+        "reminders_btn": "⏰ Reminders",
+        "progress_btn": "📊 Progress",
+        "settings_btn": "⚙️ Settings",
+        "language_btn": "Language",
+        "reminders_enabled_btn": "Reminders Enabled",
+        "default_priority_btn": "Default Priority",
+
+        # Priority buttons
+        "prio_low": "🟢 Low",
+        "prio_medium": "🟡 Medium",
+        "prio_high": "🔴 High",
+
+        # Labels
+        "priority": "Priority",
+        "deadline": "Deadline",
+
+        # Errors / info
         "no_tasks_priority": "⭐ No tasks to prioritize.",
         "no_tasks_deadline": "📅 No tasks to set deadlines."
     },
@@ -63,7 +85,7 @@ MESSAGES = {
         "your_tasks": "🗂 Deine Aufgaben:\n\n",
 
         "choose_task_priority": "⭐ Wähle eine Aufgabe für die Priorität:",
-        "choose_priority": "Prioritätsstufe wählen:",
+        "choose_priority": "Wähle Prioritätsstufe:",
         "priority_set": "✅ Priorität auf {prio} gesetzt!",
 
         "choose_task_deadline": "📅 Wähle eine Aufgabe für die Deadline:",
@@ -72,7 +94,7 @@ MESSAGES = {
 
         "reminder_what": "⏰ Woran soll ich dich erinnern?",
         "reminder_minutes": "⏱ In wie vielen Minuten?",
-        "reminder_set": "✅ Erinnerung in {minutes} Minute(n) gesetzt!",
+        "reminder_set": "✅ Erinnerung in {minutes} Minute(n) gesetzt! ",
         "reminder_error": "❌ Bitte gib eine Zahl (Minuten) ein.",
 
         "progress": "📊 Fortschritt:\nGesamtanzahl Aufgaben: {total}",
@@ -80,7 +102,29 @@ MESSAGES = {
         "settings": "⚙️ Einstellungen auswählen:",
         "choose_language": "🌐 Sprache auswählen:",
 
-        "task_added": "✅ Aufgabe '{task}' hinzugefügt!",
+        # Buttons
+        "new_plan_btn": "➕ Neuer Plan",
+        "add_task_btn": "➕ Aufgabe hinzufügen",
+        "my_tasks_btn": "🗂 Meine Aufgaben",
+        "priorities_btn": "⭐ Prioritäten",
+        "deadlines_btn": "📅 Deadlines",
+        "reminders_btn": "⏰ Erinnerungen",
+        "progress_btn": "📊 Fortschritt",
+        "settings_btn": "⚙️ Einstellungen",
+        "language_btn": "Sprache",
+        "reminders_enabled_btn": "Erinnerungen aktiv",
+        "default_priority_btn": "Standardpriorität",
+
+        # Priority buttons
+        "prio_low": "🟢 Niedrig",
+        "prio_medium": "🟡 Mittel",
+        "prio_high": "🔴 Hoch",
+
+        # Labels
+        "priority": "Priorität",
+        "deadline": "Deadline",
+
+        # Errors / info
         "no_tasks_priority": "⭐ Keine Aufgaben zur Priorisierung.",
         "no_tasks_deadline": "📅 Keine Aufgaben für Deadlines."
     },
@@ -112,7 +156,29 @@ MESSAGES = {
         "settings": "⚙️ Оберіть налаштування:",
         "choose_language": "🌐 Оберіть мову:",
 
-        "task_added": "✅ Завдання '{task}' додано!",
+        # Buttons
+        "new_plan_btn": "➕ Новий план",
+        "add_task_btn": "➕ Додати завдання",
+        "my_tasks_btn": "🗂 Мої завдання",
+        "priorities_btn": "⭐ Пріоритети",
+        "deadlines_btn": "📅 Дедлайни",
+        "reminders_btn": "⏰ Нагадування",
+        "progress_btn": "📊 Прогрес",
+        "settings_btn": "⚙️ Налаштування",
+        "language_btn": "Мова",
+        "reminders_enabled_btn": "Нагадування активні",
+        "default_priority_btn": "Стандартний пріоритет",
+
+        # Priority buttons
+        "prio_low": "🟢 Низький",
+        "prio_medium": "🟡 Середній",
+        "prio_high": "🔴 Високий",
+
+        # Labels
+        "priority": "Пріоритет",
+        "deadline": "Дедлайн",
+
+        # Errors / info
         "no_tasks_priority": "⭐ Немає завдань для пріоритетів.",
         "no_tasks_deadline": "📅 Немає завдань для дедлайнів."
     }
