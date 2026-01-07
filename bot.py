@@ -274,6 +274,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_settings.setdefault(user_id, {})["language"] = lang
         await query.message.edit_text(t(user_id, "language_set").format(lang=lang.upper()), reply_markup=get_main_keyboard(user_id))
 
+    elif data =="pick_settings_remin":
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
