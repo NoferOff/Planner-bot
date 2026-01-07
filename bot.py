@@ -275,6 +275,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.edit_text(t(user_id, "language_set").format(lang=lang.upper()), reply_markup=get_main_keyboard(user_id))
 
     elif data =="pick_settings_remin":
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardMarkup("ON", callback = "set_remin_on")],
+            [InlineKeyboardMarkup("OFF", callback = "set_remin_off")]
+        ])
+        await query.message.edit_text(t(user_id,"choose the type of reminds"), reply_markup=keyboard)
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
