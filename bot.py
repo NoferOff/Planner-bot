@@ -284,8 +284,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("set_remin_"):
         remin = data.split("_")[-1]
         user_settings.setdefault(user_id, {})["remind"] = remin
-        if "ON"(user_id) is True("reminders_enabled"):
-            await query.message
+        if "set_remin_on"(user_id):
+            asyncio.sleep() is True
+            await query.message.reply_text("⏰Reminders are enabled", reply_markup=keyboard)
+
+        else:
+            "set_remin_off"(user_id)
+            asyncio.sleep() is False
+            await query.message.reply_text("⏰Reminders are disabled", reply_markup=keyboard)
+
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
