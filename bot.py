@@ -280,6 +280,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardMarkup("OFF", callback = "set_remin_off")]
         ])
         await query.message.edit_text(t(user_id,"choose the type of reminds"), reply_markup=keyboard)
+
+    elif data.startswith("set_remin_"):
+        remin = data.split("_")[-1]
+        user_settings.setdefault(user_id, {})["remind"] = remin
+        if "ON"(user_id) is True("reminders_enabled"):
+            await query.message
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
