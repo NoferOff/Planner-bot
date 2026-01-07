@@ -276,22 +276,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data =="pick_settings_remin":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardMarkup("ON", callback = "set_remin_on")],
-            [InlineKeyboardMarkup("OFF", callback = "set_remin_off")]
+            [InlineKeyboardButton("ON", callback = "set_remin_on")],
+            [InlineKeyboardButton("OFF", callback = "set_remin_off")]
         ])
         await query.message.edit_text(t(user_id,"choose the type of reminds"), reply_markup=keyboard)
 
-    elif data.startswith("set_remin_"):
-        remin = data.split("_")[-1]
-        user_settings.setdefault(user_id, {})["remind"] = remin
-        if "set_remin_on"(user_id):
-            asyncio.sleep() is True
-            await query.message.reply_text("⏰Reminders are enabled", reply_markup=keyboard)
+    elif data == "set_remin_on":
+        user_settings.setdefault(user_id, {})["reminders_enabled"] = True
+        await query.message.edit_text("⏰ Reminders are enabled", reply_markup=get_main_keyboard(user_id))
 
-        else:
-            "set_remin_off"(user_id)
-            asyncio.sleep() is False
-            await query.message.reply_text("⏰Reminders are disabled", reply_markup=keyboard)
+    elif data == "set_remin_off":
+        user_settings.setdefault(user_id, {})["reminders_enabled"] = False
+        await query.message.edit_text("⏰ Reminders are disabled", reply_markup=get_main_keyboard(user_id))
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
