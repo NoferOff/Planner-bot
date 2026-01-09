@@ -276,19 +276,33 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data =="pick_settings_remin":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("ON", callback = "set_remin_on")],
-            [InlineKeyboardButton("OFF", callback = "set_remin_off")]
+            [InlineKeyboardButton("ON", callback_data = "set_remin_on")],
+            [InlineKeyboardButton("OFF", callback_data = "set_remin_off")]
         ])
-        await query.message.edit_text(t(user_id,"choose the type of reminds"), reply_markup=keyboard)
+        await query.message.edit_text(t(user_id,"choose the type of reminders"), reply_markup=keyboard)
 
     elif data == "set_remin_on":
-        user_settings.setdefault(user_id, {})["reminders_enabled"] = True
-        await query.message.edit_text("⏰ Reminders are enabled", reply_markup=get_main_keyboard(user_id))
+       user_settings[user_id]["reminders_enabled"] = True
+    # Додаємо задачу в планувальник
+       scheduler.add_job(send_reminder, "interval", hours=24, args=[user_id], id=f"rem_{user_id}")
+       await query.message.edit_text("⏰ Нагадування увімкнено")
 
+# Приклад для вимкнення
     elif data == "set_remin_off":
-        user_settings.setdefault(user_id, {})["reminders_enabled"] = False
-        await query.message.edit_text("⏰ Reminders are disabled", reply_markup=get_main_keyboard(user_id))
+       user_settings[user_id]["reminders_enabled"] = False
+    # Видаляємо задачу з планувальника
+       scheduler.remove_job(f"rem_{user_id}")
+       await query.message.edit_text("⏰ Нагадування вимкнено")
 
+
+async def send_reminder(user_id):
+    # Отримуємо налаштування користувача (за замовчуванням False, якщо немає даних)
+    settings = user_settings.get(user_id, {})
+    if not settings.get("reminders_enabled", False):
+        return  # Якщо вимкнено — нічого не надсилаємо
+
+    # Логіка надсилання повідомлення
+    await bot.send_message(user_id, "🔔 Це ваше нагадування!")
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
