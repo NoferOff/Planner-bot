@@ -225,7 +225,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # REMINDERS
     elif data == "reminders":
         user_state[user_id] = "WAIT_REMINDER_TEXT"
-        await query.message.edit_text(t(user_id, "reminder_what"), reply_markup=None)
+        if not user_settings.get(user_id, {}).get("reminders_enabled", True):
+            await query.message.edit_text("⏰ Reminders are currently disabled. You can enable them in Settings.", reply_markup=get_main_keyboard(user_id))
+            return
+        
+        try:
+          await query.message.edit_text(t(user_id, "reminder_what"), reply_markup=None)
+        except Exception as e:
+            print(f"Error prompting for reminder: {e}")
 
     # PROGRESS
     elif data == "progress":
