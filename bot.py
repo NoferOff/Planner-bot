@@ -18,6 +18,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 # ---------- STORAGE ----------
 user_settings = {}
 tasks = {}          # user_id -> list of tasks
+reminder_tasks = {} # user_id -> list of reminder tasks
 user_state = {}     # user_id -> state
 temp_data = {}      # user_id -> temp values (task index, reminder text)
 
@@ -231,8 +232,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         try:
           await query.message.edit_text(t(user_id, "reminder_what"), reply_markup=None)
-        except Exception as e:
-            print(f"Error prompting for reminder: {e}")
+        except asyncio.CancelledError:
+            print(f"Reminder for user {user_id} cancelled")
 
     # PROGRESS
     elif data == "progress":
@@ -301,7 +302,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "set_remin_off":
         user_settings.setdefault(user_id, {})["reminders_enabled"] = False
+        cancel_user_reminders(user_id)  
         await query.message.edit_text("⏰ Reminders are disabled", reply_markup=get_main_keyboard(user_id))
+
+def cancel_user_reminders(user_id):
+    tasks = reminder_tasks.get(user_id, [])
+    for t in tasks:
+        t.cancel()
+    reminder_tasks[user_id] = []
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -329,6 +337,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         temp_data[user_id] = text
         user_state[user_id] = "WAIT_REMINDER_TIME"
         await update.message.reply_text(t(user_id, "reminder_minutes"))
+        
 
     # REMINDER TIME
     elif state == "WAIT_REMINDER_TIME":
@@ -342,18 +351,13 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(t(user_id, "reminder_set").format(minutes=minutes), reply_markup=get_main_keyboard(user_id))
 
         async def delayed_reminder(m_time, uid, msg):
-            await maybe_sleep(uid, m_time * 60)
-
-            if not user_settings.get(uid, {}).get("reminders_enabled", True):
-               return
-
             try:
-               await context.bot.send_message(
-               chat_id=uid,
-               text=f"⏰ REMINDER:\n{msg}"
-        )
-            except Exception as e:
-                print(f"Error sending reminder: {e}")
+                await maybe_sleep(uid, m_time * 60)
+                if not user_settings.get(uid, {}).get("reminders_enabled", True):
+                 return
+                await context.bot.send_message(chat_id=uid, text=f"⏰ REMINDER:\n{msg}")
+            except asyncio.CancelledError:
+                print(f"Reminder for user {uid} cancelled")
 
         asyncio.create_task(delayed_reminder(minutes, user_id, reminder_content))
 
