@@ -335,9 +335,16 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(t(user_id, "reminder_set").format(minutes=minutes), reply_markup=get_main_keyboard(user_id))
 
         async def delayed_reminder(m_time, uid, msg):
-            await maybe_sleep(m_time * 60)
+            await maybe_sleep(uid, m_time * 60)
+
+            if not user_settings.get(uid, {}).get("reminders_enabled", True):
+               return
+
             try:
-                await context.bot.send_message(chat_id=uid, text=f"⏰ REMINDER:\n{msg}")
+               await context.bot.send_message(
+               chat_id=uid,
+               text=f"⏰ REMINDER:\n{msg}"
+        )
             except Exception as e:
                 print(f"Error sending reminder: {e}")
 
