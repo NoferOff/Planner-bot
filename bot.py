@@ -151,6 +151,13 @@ def t(user_id, key):
     lang = user_settings.get(user_id, {}).get("language", "en")
     return MESSAGES[lang].get(key, key)
 
+async def maybe_sleep(user_id, seconds):
+    """
+    Sleep only if reminders are enabled for this user
+    """
+    if user_settings.get(user_id, {}).get("reminders_enabled", True):
+        await asyncio.sleep(seconds)
+
 def get_main_keyboard(user_id):
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(t(user_id, "new_plan_btn"), callback_data="new_plan")],
@@ -282,27 +289,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.edit_text(t(user_id,"choose the type of reminders"), reply_markup=keyboard)
 
     elif data == "set_remin_on":
-       user_settings[user_id]["reminders_enabled"] = True
-    # Додаємо задачу в планувальник
-       scheduler.add_job(send_reminder, "interval", hours=24, args=[user_id], id=f"rem_{user_id}")
-       await query.message.edit_text("⏰ Нагадування увімкнено")
+        user_settings.setdefault(user_id, {})["reminders_enabled"] = True
+        await query.message.edit_text("⏰ Reminders are enabled", reply_markup=get_main_keyboard(user_id))
 
-# Приклад для вимкнення
     elif data == "set_remin_off":
-       user_settings[user_id]["reminders_enabled"] = False
-    # Видаляємо задачу з планувальника
-       scheduler.remove_job(f"rem_{user_id}")
-       await query.message.edit_text("⏰ Нагадування вимкнено")
+        user_settings.setdefault(user_id, {})["reminders_enabled"] = False
+        await query.message.edit_text("⏰ Reminders are disabled", reply_markup=get_main_keyboard(user_id))
 
-
-async def send_reminder(user_id):
-    # Отримуємо налаштування користувача (за замовчуванням False, якщо немає даних)
-    settings = user_settings.get(user_id, {})
-    if not settings.get("reminders_enabled", False):
-        return  # Якщо вимкнено — нічого не надсилаємо
-
-    # Логіка надсилання повідомлення
-    await bot.send_message(user_id, "🔔 Це ваше нагадування!")
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
@@ -342,7 +335,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(t(user_id, "reminder_set").format(minutes=minutes), reply_markup=get_main_keyboard(user_id))
 
         async def delayed_reminder(m_time, uid, msg):
-            await asyncio.sleep(m_time * 60)
+            await maybe_sleep(m_time * 60)
             try:
                 await context.bot.send_message(chat_id=uid, text=f"⏰ REMINDER:\n{msg}")
             except Exception as e:
