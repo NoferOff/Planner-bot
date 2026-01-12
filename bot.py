@@ -337,6 +337,14 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         temp_data[user_id] = text
         user_state[user_id] = "WAIT_REMINDER_TIME"
         await update.message.reply_text(t(user_id, "reminder_minutes"))
+        if not user_settings.get(user_id, {}).get("reminders_enabled", True):
+            await update.message.reply_text(
+            "⏰ Reminders are OFF. Enable them in Settings.", 
+            reply_markup=get_main_keyboard(user_id)
+            )
+            user_state.pop(user_id, None)
+            temp_data.pop(user_id, None)
+        return
         
 
     # REMINDER TIME
@@ -359,8 +367,8 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except asyncio.CancelledError:
                 print(f"Reminder for user {uid} cancelled")
 
-        asyncio.create_task(delayed_reminder(minutes, user_id, reminder_content))
-
+        task = asyncio.create_task(delayed_reminder(minutes, user_id, reminder_content))
+reminder_tasks.setdefault(user_id, []).append(task)
 # ---------- MAIN ----------
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
