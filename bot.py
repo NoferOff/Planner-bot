@@ -306,11 +306,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.edit_text("⏰ Reminders are disabled", reply_markup=get_main_keyboard(user_id))
 
 def cancel_user_reminders(user_id):
-    tasks = reminder_tasks.get(user_id, [])
-    for t in tasks:
+    tasks_to_cancel = reminder_tasks.get(user_id, [])
+    for t in tasks_to_cancel:
         t.cancel()
     reminder_tasks[user_id] = []
-
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
