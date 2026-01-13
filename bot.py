@@ -318,6 +318,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_settings.setdefault(user_id, {})["priority"] = prio
         await query.message.edit_text(t(user_id, "priority_set").format(prio=prio), reply_markup=get_main_keyboard(user_id))
 
+    elif data == "set_prio_Low":
+        user_settings.setdefault(user_id, {})["default_priority"] = "Low"
+        await query.message.edit_text(t(user_id, "priority_set").format(prio="Low"), reply_markup=get_main_keyboard(user_id))
+        
+    elif data == "set_prio_Medium":
+        user_settings.setdefault(user_id, {})["default_priority"] = "Medium"
+        await query.message.edit_text(t(user_id, "priority_set").format(prio="Medium"), reply_markup=get_main_keyboard(user_id))
+        
+    elif data == "set_prio_High":
+        user_settings.setdefault(user_id, {})["default_priority"] = "High"
+        await query.message.edit_text(t(user_id, "priority_set").format(prio="High"), reply_markup=get_main_keyboard(user_id))
+
     def cancel_user_reminders(user_id):
      tasks_to_cancel = reminder_tasks.get(user_id, [])
      for t in tasks_to_cancel:
