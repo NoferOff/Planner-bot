@@ -349,7 +349,6 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif state == "WAIT_REMINDER_TEXT":
         temp_data[user_id] = text
         user_state[user_id] = "WAIT_REMINDER_TIME"
-        await update.message.reply_text(t(user_id, "reminder_minutes"))
         if not user_settings.get(user_id, {}).get("reminders_enabled", True):
             await update.message.reply_text(
             "⏰ Reminders are OFF. Enable them in Settings.", 
@@ -357,7 +356,9 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             user_state.pop(user_id, None)
             temp_data.pop(user_id, None)
-        return
+            return
+       
+        await update.message.reply_text(t(user_id, "reminder_minutes"), reply_markup=None)
         
 
     # REMINDER TIME
