@@ -305,11 +305,25 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cancel_user_reminders(user_id)  
         await query.message.edit_text("⏰ Reminders are disabled", reply_markup=get_main_keyboard(user_id))
 
-def cancel_user_reminders(user_id):
-    tasks_to_cancel = reminder_tasks.get(user_id, [])
-    for t in tasks_to_cancel:
+    elif data == "pick_settings_prio":
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("Low", callback_data="set_prio_Low")],
+            [InlineKeyboardButton("Medium", callback_data="set_prio_Medium")],
+            [InlineKeyboardButton("High", callback_data="set_prio_High")]
+        ])
+        await query.message.edit_text(t(user_id, "choose_priority"), reply_markup=keyboard)
+
+    elif data.startswith("set_prio_"):
+        prio = data.split("_")[-1]
+        user_settings.setdefault(user_id, {})["priority"] = prio
+        await query.message.edit_text(t(user_id, "priority_set").format(prio=prio), reply_markup=get_main_keyboard(user_id))
+
+    def cancel_user_reminders(user_id):
+     tasks_to_cancel = reminder_tasks.get(user_id, [])
+     for t in tasks_to_cancel:
         t.cancel()
     reminder_tasks[user_id] = []
+
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
@@ -367,7 +381,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 print(f"Reminder for user {uid} cancelled")
 
         task = asyncio.create_task(delayed_reminder(minutes, user_id, reminder_content))
-reminder_tasks.setdefault(user_id, []).append(task)
+        reminder_tasks.setdefault(user_id, []).append(task)
 # ---------- MAIN ----------
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
