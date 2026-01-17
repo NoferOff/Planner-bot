@@ -159,6 +159,12 @@ async def maybe_sleep(user_id, seconds):
     if user_settings.get(user_id, {}).get("reminders_enabled", True):
         await asyncio.sleep(seconds)
 
+def cancel_user_reminders(user_id):
+     tasks_to_cancel = reminder_tasks.get(user_id, [])
+     for t in tasks_to_cancel:
+        t.cancel()
+     reminder_tasks[user_id] = []
+
 def get_main_keyboard(user_id):
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(t(user_id, "new_plan_btn"), callback_data="new_plan")],
@@ -329,12 +335,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "set_prio_High":
         user_settings.setdefault(user_id, {})["default_priority"] = "prio_high"
         await query.message.edit_text(t(user_id, "priority_set").format(prio="High"), reply_markup=get_main_keyboard(user_id))
-
-    def cancel_user_reminders(user_id):
-     tasks_to_cancel = reminder_tasks.get(user_id, [])
-     for t in tasks_to_cancel:
-        t.cancel()
-    reminder_tasks[user_id] = []
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
