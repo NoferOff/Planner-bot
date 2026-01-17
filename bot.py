@@ -313,26 +313,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "pick_settings_prio":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("Low", callback_data="set_prio_Low")],
-            [InlineKeyboardButton("Medium", callback_data="set_prio_Medium")],
-            [InlineKeyboardButton("High", callback_data="set_prio_High")]
+            [InlineKeyboardButton("Low", callback_data="settings_prio_Low")],
+            [InlineKeyboardButton("Medium", callback_data="settings_prio_Medium")],
+            [InlineKeyboardButton("High", callback_data="settings_prio_High")]
         ])
         await query.message.edit_text(t(user_id, "choose_priority"), reply_markup=keyboard)
 
-    elif data.startswith("set_prio_"):
+    elif data.startswith("settings_prio_"):
         prio = data.split("_")[-1]
         user_settings.setdefault(user_id, {})["priority"] = prio
         await query.message.edit_text(t(user_id, "priority_set").format(prio=prio), reply_markup=get_main_keyboard(user_id))
 
-    elif data == "set_prio_Low":
+    elif data == "settings_prio_Low":
         user_settings.setdefault(user_id, {})["default_priority"] = "prio_low"
         await query.message.edit_text(t(user_id, "priority_set").format(prio="Low"), reply_markup=get_main_keyboard(user_id))
-        
-    elif data == "set_prio_Medium":
+
+    elif data == "settings_prio_Medium":
         user_settings.setdefault(user_id, {})["default_priority"] = "prio_medium"
         await query.message.edit_text(t(user_id, "priority_set").format(prio="Medium"), reply_markup=get_main_keyboard(user_id))
-        
-    elif data == "set_prio_High":
+
+    elif data == "settings_prio_High":
         user_settings.setdefault(user_id, {})["default_priority"] = "prio_high"
         await query.message.edit_text(t(user_id, "priority_set").format(prio="High"), reply_markup=get_main_keyboard(user_id))
 
@@ -344,7 +344,12 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ADD TASK
     if state == "WAIT_TASK":
-        tasks.setdefault(user_id, []).append({"text": text, "priority": "None", "deadline": "None"})
+        default_prio = user_settings.get(user_id, {}).get("default_priority", "Medium")
+        tasks.setdefault(user_id, []).append({
+             "text": text,
+             "priority": default_prio,
+             "deadline": "None"
+            })
         user_state.pop(user_id, None)
         await update.message.reply_text(t(user_id, "task_added").format(task=text), reply_markup=get_main_keyboard(user_id))
 
