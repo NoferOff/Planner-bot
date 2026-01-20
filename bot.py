@@ -164,8 +164,8 @@ async def maybe_sleep(user_id, seconds):
 
 def cancel_user_reminders(user_id):
      tasks_to_cancel = reminder_tasks.get(user_id, [])
-     for t in tasks_to_cancel:
-        t.cancel()
+     for task in tasks_to_cancel:
+        task.cancel()
      reminder_tasks[user_id] = []
 
 def get_main_keyboard(user_id):
@@ -330,19 +330,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         prio = data.split("_")[-1]
         user_settings.setdefault(user_id, {})["priority"] = prio
         await query.message.edit_text(t(user_id, "priority_set").format(prio=prio), reply_markup=get_main_keyboard(user_id))
-
-    elif data == "settings_prio_Low":
-        user_settings.setdefault(user_id, {})["default_priority"] = "prio_low"
-        await query.message.edit_text(t(user_id, "priority_set").format(prio="Low"), reply_markup=get_main_keyboard(user_id))
-
-    elif data == "settings_prio_Medium":
-        user_settings.setdefault(user_id, {})["default_priority"] = "prio_medium"
-        
-        await query.message.edit_text(t(user_id, "priority_set").format(prio="Medium"), reply_markup=get_main_keyboard(user_id))
-
-    elif data == "settings_prio_High":
-        user_settings.setdefault(user_id, {})["default_priority"] = "prio_high"
-        await query.message.edit_text(t(user_id, "priority_set").format(prio="High"), reply_markup=get_main_keyboard(user_id))
 
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
