@@ -45,6 +45,7 @@ MESSAGES = {
         "progress": "📊 Progress:\nTotal tasks: {total}",
         "settings": "⚙️ Choose your settings:",
         "choose_language": "🌐 Choose language:",
+        "choose_reminder_type": "⏰ Choose reminder settings:",
         "new_plan_btn": "➕ New Plan",
         "add_task_btn": "➕ Add Task",
         "my_tasks_btn": "🗂 My Tasks",
@@ -85,6 +86,7 @@ MESSAGES = {
         "progress": "📊 Fortschritt:\nGesamtanzahl Aufgaben: {total}",
         "settings": "⚙️ Einstellungen auswählen:",
         "choose_language": "🌐 Sprache auswählen:",
+        "choose_reminder_type": "⏰ Erinnerungseinstellungen wählen:",
         "new_plan_btn": "➕ Neuer Plan",
         "add_task_btn": "➕ Aufgabe hinzufügen",
         "my_tasks_btn": "🗂 Meine Aufgaben",
@@ -330,6 +332,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "settings_prio_Medium":
         user_settings.setdefault(user_id, {})["default_priority"] = "prio_medium"
+        
         await query.message.edit_text(t(user_id, "priority_set").format(prio="Medium"), reply_markup=get_main_keyboard(user_id))
 
     elif data == "settings_prio_High":
