@@ -211,6 +211,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not tasks[user_id]:
             await query.message.edit_text(t(user_id, "no_tasks"), reply_markup=get_main_keyboard(user_id))
         else:
+            if setdefaults := user_settings.get(user_id, {}).get("default_priority"):
+                for tsk in tasks[user_id]:
+                    if tsk["priority"] == "Medium":
+                        tsk["priority"] = setdefaults
             text = t(user_id, "your_tasks")
             for i, tsk in enumerate(tasks[user_id], 1):
                 text += f"{i}. {tsk['text']} | {t(user_id, 'priority')}: {tsk['priority']} | {t(user_id, 'deadline')}: {tsk['deadline']}\n"
