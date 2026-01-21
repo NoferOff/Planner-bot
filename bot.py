@@ -211,10 +211,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not tasks[user_id]:
             await query.message.edit_text(t(user_id, "no_tasks"), reply_markup=get_main_keyboard(user_id))
         else:
-            if setdefaults := user_settings.get(user_id, {}).get("default_priority"):
-                for tsk in tasks[user_id]:
-                    if tsk["priority"] == "Medium" or tsk["priority"] == "Low" or tsk["priority"] == "High":
-                        tsk["priority"] = setdefaults
             text = t(user_id, "your_tasks")
             for i, tsk in enumerate(tasks[user_id], 1):
                 text += f"{i}. {tsk['text']} | {t(user_id, 'priority')}: {tsk['priority']} | {t(user_id, 'deadline')}: {tsk['deadline']}\n"
@@ -328,7 +324,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("settings_prio_"):
         prio = data.split("_")[-1]
-        user_settings.setdefault(user_id, {})["priority"] = prio
+        user_settings.setdefault(user_id, {})["default_priority"] = prio
         await query.message.edit_text(t(user_id, "priority_set").format(prio=prio), reply_markup=get_main_keyboard(user_id))
 
 # ---------- TEXT HANDLER ----------
