@@ -213,7 +213,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             if setdefaults := user_settings.get(user_id, {}).get("default_priority"):
                 for tsk in tasks[user_id]:
-                    if tsk["priority"] == "Medium":
+                    if tsk["priority"] == "Medium" or tsk["priority"] == "Low" or tsk["priority"] == "High":
                         tsk["priority"] = setdefaults
             text = t(user_id, "your_tasks")
             for i, tsk in enumerate(tasks[user_id], 1):
