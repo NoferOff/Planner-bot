@@ -265,6 +265,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ])
         await query.message.edit_text(t(user_id, "settings"), reply_markup=keyboard)
 
+
     # Priority selection
     elif data.startswith("pick_pri_"):
         temp_data[user_id] = int(data.split("_")[-1])
@@ -333,11 +334,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_settings.setdefault(user_id, {})["default_priority"] = prio
         await query.message.edit_text(t(user_id, "priority_set").format(prio=prio), reply_markup=get_main_keyboard(user_id))
 
+    user_settings[user_id]["default_priority"] = prio
+    with open("settings.json", "w", encoding="utf-8") as f:
+      json.dump(user_settings, f, ensure_ascii=False, indent=4)
+
 # ---------- TEXT HANDLER ----------
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     text = update.message.text
     state = user_state.get(user_id)
+
+    tasks.setdefault(user_id, []).append({...})
+    with open("tasks.json", "w", encoding="utf-8") as f:
+       json.dump(tasks, f, ensure_ascii=False, indent=4)
 
     # ADD TASK
     if state == "WAIT_TASK":
