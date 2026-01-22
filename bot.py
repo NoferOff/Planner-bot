@@ -1,5 +1,6 @@
 import os
 import asyncio
+import json
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -21,7 +22,12 @@ tasks = {}          # user_id -> list of tasks
 reminder_tasks = {} # user_id -> list of reminder tasks
 user_state = {}     # user_id -> state
 temp_data = {}      # user_id -> temp values (task index, reminder text)
-
+if os.path.exists("tasks.json"):
+    with open("tasks.json", "r") as f:
+        tasks = json.load(f)
+if os.path.exists("settings.json"):
+    with open("settings.json", "r") as f:
+        user_settings = json.load(f)
 # ---------- MESSAGES ----------
 MESSAGES = {
     "en": {
